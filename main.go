@@ -33,6 +33,8 @@ func main() {
 
 	server.GET("/", getTasks)
 
+	server.POST("/", createTask)
+
 	server.Logger.Fatal(server.Start(port))
 }
 
