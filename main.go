@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -25,7 +25,7 @@ var db scribble.Driver
 func main() {
 	d, dbErr := scribble.New(dbName, nil)
 	if dbErr != nil {
-		fmt.Println("Failed to connect to database", dbErr)
+		log.Fatal("Failed to connect to database", dbErr)
 	}
 	db = *d
 
