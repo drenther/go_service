@@ -54,7 +54,7 @@ func getUser(authHeader string) (string, error) {
 
 	substrings := strings.Split(strings.ToLower(authHeader), " ")
 
-	if len(substrings) < 2 && substrings[0] != "" && substrings[1] != "" {
+	if len(substrings) < 2 || (substrings[0] == "" && substrings[1] == "") {
 		return "", echo.ErrUnauthorized
 	}
 
@@ -101,6 +101,7 @@ func getTasks(c echo.Context) (err error) {
 
 	for _, f := range records {
 		task := Task{}
+		// typecasting "f" string as []byte
 		if err = json.Unmarshal([]byte(f), &task); err != nil {
 			return
 		}
