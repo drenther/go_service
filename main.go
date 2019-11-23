@@ -47,14 +47,28 @@ type Task struct {
 	Body string `json:"body"`
 }
 
-func getUser(authHeader string) string {
-	return strings.Split(strings.ToLower(authHeader), " ")[1]
+func getUser(authHeader string) (string, error) {
+	if authHeader == "" {
+		return "", echo.ErrUnauthorized
+	}
+
+	substrings := strings.Split(strings.ToLower(authHeader), " ")
+
+	if len(substrings) < 2 && substrings[0] != "" && substrings[1] != "" {
+		return "", echo.ErrUnauthorized
+	}
+
+	return substrings[1], nil
 }
 
 func createTask(c echo.Context) (err error) {
 	context := c.(*ContextWithDB)
 
-	user := getUser(context.Request().Header.Get("Authorization"))
+	user, err := getUser(context.Request().Header.Get("Authorization"))
+	if err != nil {
+		return err
+	}
+
 	id := uuid.NewV4().String()
 	task := &Task{
 		Id:   id,
@@ -74,7 +88,10 @@ func createTask(c echo.Context) (err error) {
 
 func getTasks(c echo.Context) (err error) {
 	context := c.(*ContextWithDB)
-	user := getUser(context.Request().Header.Get("Authorization"))
+	user, err := getUser(context.Request().Header.Get("Authorization"))
+	if err != nil {
+		return err
+	}
 
 	tasks := []Task{}
 	records, err := context.Db.ReadAll(dbName)
